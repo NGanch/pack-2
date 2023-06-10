@@ -8,6 +8,10 @@ export class Gallery extends Component {
     query: '',
     images: [],
     page: 1,
+    isShowButton: false,
+    isEmpty: false,
+    isLoading: false,
+    error: null,
   };
   // componentDidMount() {
   //   ImageService.getImages('cat', 1);
@@ -15,23 +19,49 @@ export class Gallery extends Component {
 
   componentDidUpdate(_, prevState) {
     const { query, page } = this.state;
-    if (prevState.query !== query) {
+    if (prevState.query !== query || prevState.page !== page) {
       this.getImages(query, page);
     }
   }
-  getImages = async (query, page) => {
-    const result = await ImageService.getImages(query, page);
-    console.log(result);
-    this.setState({ images: result.data.photos });
+  getImages = async (query, currentPage) => {
+    this.setState({isLoading: true});
+  try{
+
+  const {data} = await ImageService.getImages(query, currentPage);
+  
+  const {page, per_page, photos, total_results} = data;
+
+  if(!photos.length){
+    this.setState({isEmpty: true})
+    return;
+  }
+
+  this.setState(prevState => ({ images: [...prevState.images, ...photos], isShowButton: page < Math.ceil(total_results / per_page), }));
+  }catch(error){
+  this.setState({error: error.message});
+  }
+  finally{
+    this.setState({isLoading: false});
+  }
+
   };
 
   handleSubmit = value => {
-    this.setState({ query: value });
+    this.setState({ query: value, images: [], 
+      page: 1, 
+      isShowButton: false,
+      isEmpty: false,
+      isLoading: false,
+      error: null,});
     console.log(value);
   };
-
+  handleOnClick = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }))
+  }
   render() {
-    const { images } = this.state;
+    const { images, isShowButton, isLoading, isEmpty } = this.state;
     return (
       <>
         <SearchForm onSubmit={this.handleSubmit} />
@@ -44,7 +74,9 @@ export class Gallery extends Component {
             </GridItem>
           ))}
         </Grid>
-        <Text textAlign="center">Sorry. There are no images ... 😭</Text>
+        { isShowButton && <Button onClick={this.handleOnClick}>Load more</Button>}
+        {isEmpty &&  <Text textAlign="center">Sorry. There are no images ... 😭</Text>}
+        {isLoading && <Text textAlign="center">Loading ...</Text>}
       </>
     );
   }
