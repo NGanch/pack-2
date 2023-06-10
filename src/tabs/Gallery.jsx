@@ -44,7 +44,6 @@ export class Gallery extends Component {
   finally{
     this.setState({isLoading: false});
   }
-
   };
 
   handleSubmit = value => {
