@@ -37,7 +37,8 @@ export class Gallery extends Component {
   }
 
   this.setState(prevState => ({ images: [...prevState.images, ...photos], isShowButton: page < Math.ceil(total_results / per_page), }));
-  }catch(error){
+  }
+  catch(error){
   this.setState({error: error.message});
   }
   finally{
