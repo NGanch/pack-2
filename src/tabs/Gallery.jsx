@@ -36,15 +36,13 @@ export class Gallery extends Component {
       <>
         <SearchForm onSubmit={this.handleSubmit} />
         <Grid>
-          {images.map(({ alt, id, src }) => {
-            return (
-              <GridItem key={id}>
-                <CardItem>
-                  <img src={src.small} alt={alt} />
-                </CardItem>
-              </GridItem>
-            );
-          })}
+          {images.map(({ alt, id, src }) => (
+            <GridItem key={id}>
+              <CardItem>
+                <img src={src.small} alt={alt} />
+              </CardItem>
+            </GridItem>
+          ))}
         </Grid>
         <Text textAlign="center">Sorry. There are no images ... 😭</Text>
       </>
